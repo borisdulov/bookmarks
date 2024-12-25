@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1086764183481",
+    "project_id": "authexample-afbbd",
+    "storage_bucket": "authexample-afbbd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086764183481:android:eef226025ee1b3f937d068",
+        "android_client_info": {
+          "package_name": "com.example.firebase_auth_ex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5MK_glLphz2XGHXQ_pC_RsgjHqiP013g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086764183481:android:061d54432bbc478c37d068",
+        "android_client_info": {
+          "package_name": "com.boryandra.bookmarksapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5MK_glLphz2XGHXQ_pC_RsgjHqiP013g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
