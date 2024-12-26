@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BookmarkCubit extends Cubit<BookmarkState> {
   //? Я пытался привести их под один интерфейс, но это только мешало и пользы не было
+  //TODO надо бы все таки привести их к одному, а то не красиво
   final ILocalBookmarkRepository _localRepository;
   final IRemoteBookmarkRepository? _remoteRepository;
 
@@ -21,10 +22,12 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       IRemoteBookmarkRepository? remoteRepository,
       required SyncService syncService,
       required PreviewService previewService})
+      //
       : _localRepository = localRepository,
         _remoteRepository = remoteRepository,
         _syncService = syncService,
         _previewService = previewService,
+        //
         super(BookmarkState(
             isLoading: false,
             bookmarkList: [],
@@ -33,9 +36,12 @@ class BookmarkCubit extends Cubit<BookmarkState> {
     loadBookmarks(withReload: true, withSync: true);
   }
 
+  /// Подгрузить закладки в стейт
   Future<void> loadBookmarks(
       {bool withReload = false, bool withSync = false}) async {
     try {
+      //* Хз что может произойти если подгрузить еще раз во время загрузки
+      //* На всяки случай нельзя
       if (state.isLoading) throw AlreadyLoadingException;
 
       emit(state.copyWith(isLoading: withReload, isSyncing: withSync));
@@ -68,8 +74,10 @@ class BookmarkCubit extends Cubit<BookmarkState> {
     }
   }
 
+  /// Создание закладки в стейте, локальном и удаленом репозитории
   Future<void> createBookmark(BookmarkModel bookmark) async {
     try {
+      //* Хз что может произойти, на всяки случай нельзя
       if (state.isLoading) throw AlreadyLoadingException;
 
       emit(state.copyWith(isLoading: true));
@@ -112,8 +120,10 @@ class BookmarkCubit extends Cubit<BookmarkState> {
     }
   }
 
+  /// Удаление закладки в стейте, локальном и удаленом репозитории
   Future<void> deleteBookmark(BookmarkModel bookmark) async {
     try {
+      //* Хз что может произойти, на всяки случай нельзя
       if (state.isLoading) throw AlreadyLoadingException;
 
       emit(state.copyWith(isLoading: true));
@@ -151,18 +161,5 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       return bookmarkList[foundBookmarkId];
     }
     return null;
-  }
-
-  bool isDuplicate(String url) {
-    final bookmarkList = state.bookmarkList;
-
-    final foundBookmarkId = bookmarkList.indexWhere(
-      (bookmark) => bookmark.url == url,
-    );
-
-    if (foundBookmarkId != -1) {
-      return true;
-    }
-    return false;
   }
 }

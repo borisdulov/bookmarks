@@ -1,15 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth_ex/core/extension/build_context_extension.dart';
 import 'package:firebase_auth_ex/core/theme/app_theme_constants.dart';
-import 'package:firebase_auth_ex/feature/auth/cubit/auth_cubit.dart';
-import 'package:firebase_auth_ex/feature/auth/cubit/auth_state.dart';
+import 'package:firebase_auth_ex/feature/auth/cubit/auth_builder.dart';
 import 'package:firebase_auth_ex/feature/auth/page/registration_page.dart';
 import 'package:firebase_auth_ex/feature/home/page/home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+/// Страница входа в аккаунт
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -22,13 +21,17 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  //* Не видно ли пароль
   bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(builder: (context, state) {
+    return AuthBuilder(builder: (context, state) {
       return Scaffold(
+        //* Стэк чтобы индикатор загрузки норм отобразить вверху
         body: Stack(
+          //* Картинка на бг
           children: [
             Container(
               decoration: const BoxDecoration(
@@ -39,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               child: Center(
+                //* Основная карточка
                 child: Card(
                   margin: const EdgeInsets.all(AppPadding.m),
                   elevation: 4,
@@ -53,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        //* Поле почты
                         TextFormField(
                           controller: emailController,
                           decoration: InputDecoration(
@@ -68,9 +73,9 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),
 
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppPadding.s),
 
-                        // Password TextField
+                        //* Поле пароля
                         TextFormField(
                           controller: passwordController,
                           decoration: InputDecoration(
@@ -98,8 +103,9 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppPadding.m),
 
+                        //* Кнопка входа
                         FilledButton(
                           onPressed: () {
                             context.authCubit.signIn(
@@ -108,36 +114,24 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           style: FilledButton.styleFrom(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(AppRadius.xs),
                             ),
                             minimumSize: const Size.fromHeight(56),
                           ),
                           child: Text('logIn'.tr()),
                         ),
 
-                        const Divider(height: 24),
+                        const SizedBox(height: AppPadding.l),
 
-                        OutlinedButton.icon(
-                          onPressed: () {
-                            context.authCubit.signInWithGoogle();
-                          },
-                          icon: SvgPicture.asset('assets/google.svg',
-                              width: 24, height: 24),
-                          label: const Text('Continue with Google'),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            side: BorderSide(color: Colors.grey.shade300),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            minimumSize: const Size.fromHeight(56),
-                          ),
-                        ),
+                        //* Войти через гугл
+                        const SignInWithGoogleButton(),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppPadding.l),
 
+                        //* Ряд с дополнительными действиями
                         Row(
                           children: [
+                            //* Создать аккаунт
                             Expanded(
                               child: TextButton(
                                 onPressed: () =>
@@ -145,14 +139,16 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text('createAccount'.tr()),
                               ),
                             ),
+                            //* Вертикальный разделитель
                             const SizedBox(
-                              height: 16,
+                              height: AppPadding.m,
                               child: VerticalDivider(
                                 width: 1,
                                 thickness: 1,
                                 color: Colors.grey,
                               ),
                             ),
+                            //* Продолжить как гость (без входа)
                             Expanded(
                               child: TextButton(
                                 onPressed: () => context.go(HomePage.path),
@@ -167,6 +163,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
+            //* Индикатор загрузки
             if (state.isLoading) const LinearProgressIndicator()
           ],
         ),
@@ -179,5 +176,30 @@ class _LoginPageState extends State<LoginPage> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+}
+
+class SignInWithGoogleButton extends StatelessWidget {
+  const SignInWithGoogleButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: () {
+        context.authCubit.signInWithGoogle();
+      },
+      icon: SvgPicture.asset('assets/google.svg', width: 24, height: 24),
+      label: const Text('Continue with Google'),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: AppPadding.m),
+        side: BorderSide(color: Colors.grey.shade300),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xs),
+        ),
+        minimumSize: const Size.fromHeight(56),
+      ),
+    );
   }
 }

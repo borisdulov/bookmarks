@@ -12,16 +12,19 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthCubit extends Cubit<AuthState> {
   final FirebaseAuth _firebaseAuth;
   late StreamSubscription<User?> _streamSubscription;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn;
 
-  AuthCubit({
-    required FirebaseAuth firebaseAuth,
-  })  : _firebaseAuth = firebaseAuth,
+  AuthCubit(
+      {required FirebaseAuth firebaseAuth, required GoogleSignIn googleSignIn})
+      : _firebaseAuth = firebaseAuth,
+        _googleSignIn = googleSignIn,
         super(AuthStateLoading()) {
+    //* Подписываемся на изменения в firebaseAuth
     _streamSubscription =
         _firebaseAuth.authStateChanges().listen(_onAuthStateChange);
   }
 
+  //* Обработчик событий firebaseAuth
   void _onAuthStateChange(User? user) {
     if (user != null) {
       emit(AuthStateAuthenticated(user: user));

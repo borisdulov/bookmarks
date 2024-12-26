@@ -1,30 +1,35 @@
-import 'package:firebase_auth_ex/feature/bookmark/cubit/bookmark_cubit.dart';
+import 'package:firebase_auth_ex/core/extension/build_context_extension.dart';
+import 'package:firebase_auth_ex/core/theme/app_theme_constants.dart';
 import 'package:firebase_auth_ex/feature/bookmark/model/bookmark_model.dart';
 import 'package:firebase_auth_ex/feature/bookmark/widget/bookmark_list_tile_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Список закладок
 class BookmarkListWidget extends StatelessWidget {
-  const BookmarkListWidget({super.key, required this.bookmarkList});
-
   final List<BookmarkModel> bookmarkList;
+
+  const BookmarkListWidget({super.key, required this.bookmarkList});
 
   @override
   Widget build(BuildContext context) {
+    //* Рефреш скролом вверх (на мобилке)
     return RefreshIndicator(
-      onRefresh: () => context
-          .read<BookmarkCubit>()
-          .loadBookmarks(withReload: true, withSync: true),
+      onRefresh: () =>
+          context.bookmarkCubit.loadBookmarks(withReload: true, withSync: true),
       child: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16),
+        //* Паддинги по бокам
+        padding: const EdgeInsets.only(left: AppPadding.m, right: AppPadding.m),
         child: Center(
+          //* Ограничение ширины
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 800),
+            //* Список из BookmarkListTileWidget с разделителем
             child: ListView.separated(
-              separatorBuilder: (context, index) => const SizedBox(
-                height: 8,
-              ),
-              padding: const EdgeInsets.only(top: 16, bottom: 84),
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppPadding.s),
+              //* Паддинги сверху и снизу (снизу побольше чтобы fab не мешал)
+              padding: const EdgeInsets.only(
+                  top: AppPadding.m, bottom: AppPadding.xxl),
               itemCount: bookmarkList.length,
               itemBuilder: (context, index) {
                 final bookmark = bookmarkList[index];

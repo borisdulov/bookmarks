@@ -3,6 +3,7 @@ import 'package:firebase_auth_ex/feature/bookmark/model/bookmark_model.dart';
 import 'package:firebase_auth_ex/feature/bookmark/repository/local_bookmark_repository_interface.dart';
 import 'package:firebase_auth_ex/feature/bookmark/repository/remote_bookmark_repository_interface.dart';
 
+/// Сервис для синхронизации закладок в локальном и удаленном репоизториях
 final class SyncService {
   Future<List<BookmarkModel>?> synchronize(
       {required ILocalBookmarkRepository localRepository,
@@ -29,23 +30,32 @@ final class SyncService {
         final remoteBookmark = remoteBookmarkMap[url];
 
         if (localBookmark == null) {
-          // Bookmark only exists in remote, add to local
+          //* Если закладка только в удаленном репозитории
           mergedBookmarks.add(remoteBookmark!);
         } else if (remoteBookmark == null) {
-          // Bookmark only exists in local, add to remote
+          //* Если закладка только в локальном репозитории
           mergedBookmarks.add(localBookmark.copyWith(isSynced: true));
           bookmarksToCreateRemotly.add(localBookmark.copyWith(isSynced: true));
         } else {
-          if (localBookmark.updatedAt.isAfter(remoteBookmark.updatedAt)) {
+          //* Если закладка в обоих репозиториях
+          //? Какая то из них может быть новее, надо проверить
+          if (localBookmark.updatedAt == remoteBookmark.updatedAt) {
+            //* Дата создания одинаковая
+            mergedBookmarks.add(localBookmark);
+          } else if (localBookmark.updatedAt
+              .isAfter(remoteBookmark.updatedAt)) {
+            //* Локальная новее
             mergedBookmarks.add(localBookmark);
             bookmarksToDeleteRemotly.add(remoteBookmark.url);
             bookmarksToCreateRemotly.add(localBookmark);
           } else {
+            //* Удаленная новее
             mergedBookmarks.add(remoteBookmark);
           }
         }
       }
 
+      //TODO локальному репозиторию тоже надо методы createBookmarks и deleteBookmarks
       await localRepository.updateBookmarks(mergedBookmarks);
       await remoteRepository.deleteBookmarks(bookmarksToDeleteRemotly);
       await remoteRepository.createBookmarks(bookmarksToCreateRemotly);

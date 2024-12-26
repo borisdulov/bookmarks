@@ -1,4 +1,7 @@
 abstract class AppRadius {
+  /// 4
+  static const double xs = 4.0;
+
   /// 8
   static const double s = 8.0;
 

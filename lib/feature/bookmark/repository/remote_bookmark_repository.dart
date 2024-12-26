@@ -5,6 +5,7 @@ import 'package:firebase_auth_ex/core/service/local_storage_service.dart';
 import 'package:firebase_auth_ex/feature/bookmark/model/bookmark_model.dart';
 import 'package:firebase_auth_ex/feature/bookmark/repository/remote_bookmark_repository_interface.dart';
 
+/// Реализация удаленного репозитория закладок с firestore
 final class RemoteBookmarkRepository implements IRemoteBookmarkRepository {
   final FirebaseFirestore _firestore;
   final User _user;
@@ -41,23 +42,24 @@ final class RemoteBookmarkRepository implements IRemoteBookmarkRepository {
     }
   }
 
+  /// Перезаписывает все закладки пользователя
   @override
   Future<void> updateBookmarks(List<BookmarkModel> bookmarks) async {
     try {
-      // Все закладки пользователя
+      //* Все закладки пользователя
       final userBookmarksQuery =
           _bookmarksCollection.where('userId', isEqualTo: _user.uid);
 
-      // Используем батч для эффективности
+      //* Используем батч для эффективности
       final batch = _firestore.batch();
 
-      // Удаляем все существующие закладки пользователя
+      //* Удаляем все существующие закладки пользователя
       final existingBookmarks = await userBookmarksQuery.get();
       for (var doc in existingBookmarks.docs) {
         batch.delete(doc.reference);
       }
 
-      // Добавляем новые закладки
+      //* Добавляем новые закладки
       for (var bookmark in bookmarks) {
         final bookmarkJson = bookmark.toJson();
 
@@ -67,7 +69,7 @@ final class RemoteBookmarkRepository implements IRemoteBookmarkRepository {
         batch.set(newBookmarkRef, bookmarkJson);
       }
 
-      // Совершаем батч
+      //* Совершаем батч
       await batch.commit();
     } catch (e, stackTrace) {
       AppExceptionHandler.handleException(e, stackTrace);
@@ -79,19 +81,19 @@ final class RemoteBookmarkRepository implements IRemoteBookmarkRepository {
     try {
       final bookmarkJson = bookmark.toJson();
 
-      // Найти существующую закладку с таким же URL для текущего пользователя
+      //* Найти существующую закладку с таким же URL для текущего пользователя
       final existingBookmarkQuery = await _bookmarksCollection
           .where('userId', isEqualTo: _user.uid)
           .where('url', isEqualTo: bookmark.url)
           .get();
 
       if (existingBookmarkQuery.docs.isNotEmpty) {
-        // Если закладка существует, обновляем ее
+        //* Если закладка существует, обновляем ее
         final existingBookmarkDoc = existingBookmarkQuery.docs.first;
         await existingBookmarkDoc.reference
             .update({...bookmarkJson, "userId": _user.uid});
       } else {
-        // Если закладки нет, создаем новую
+        //* Если закладки нет, создаем новую
         await _bookmarksCollection.add({...bookmarkJson, "userId": _user.uid});
       }
     } catch (e, stackTrace) {

@@ -1,15 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth_ex/core/extension/build_context_extension.dart';
 import 'package:firebase_auth_ex/core/theme/app_theme_constants.dart';
-import 'package:firebase_auth_ex/feature/bookmark/cubit/bookmark_cubit.dart';
-import 'package:firebase_auth_ex/feature/bookmark/cubit/bookmark_state.dart';
+import 'package:firebase_auth_ex/feature/bookmark/cubit/bookmark_builder.dart';
 import 'package:firebase_auth_ex/feature/bookmark/model/bookmark_model.dart';
 import 'package:firebase_auth_ex/feature/bookmark/widget/bookmark_list_widget.dart';
 import 'package:firebase_auth_ex/feature/home/widget/drawer_widget.dart';
 import 'package:firebase_auth_ex/feature/bookmark/widget/create_bookmark_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Главный экран с поиском, выбором папки и списком закладок
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -19,6 +18,7 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
 }
 
+//? Хз что делает этот миксин, но помоему с ним табы перелистываются лучше
 class HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
@@ -33,7 +33,7 @@ class HomePageState extends State<HomePage>
   }
 
   void _onSearchTextChanged() {
-    final bookmarks = context.bookmarkListCubit.state.bookmarkList;
+    final bookmarks = context.bookmarkCubit.state.bookmarkList;
     final searchQuery = _searchController.text.toLowerCase().trim();
 
     setState(() {
@@ -41,8 +41,9 @@ class HomePageState extends State<HomePage>
         _isSearching = false;
       } else {
         _isSearching = true;
+
+        //* Поиск по title и url (без учета регистра)
         _filteredBookmarks = bookmarks.where((bookmark) {
-          // Поиск по title и url (без учета регистра)
           final titleMatch = bookmark.title.toLowerCase().contains(searchQuery);
           final urlMatch = bookmark.url.toLowerCase().contains(searchQuery);
 
@@ -54,25 +55,31 @@ class HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BookmarkCubit, BookmarkState>(builder: (context, state) {
+    return BookmarkBuilder(builder: (context, state) {
       final bookmarkList =
           _isSearching ? _filteredBookmarks : state.bookmarkList;
+
       return DefaultTabController(
+        //? +1 потому что тут нет папки All
         length: state.folderList.length + 1,
         child: Scaffold(
           resizeToAvoidBottomInset: true,
           drawer: const DrawerWidget(),
           appBar: AppBar(
+            //? Убираем кнопку шторки, чтобы сделать свою
             automaticallyImplyLeading: false,
             toolbarHeight: AppPadding.xxl,
             title: Column(
               children: [
                 const SizedBox(height: AppPadding.m),
                 Builder(builder: (context) {
+                  //* Поиск по закладкам
                   return SearchBar(
                     elevation: const WidgetStatePropertyAll(0),
                     controller: _searchController,
                     hintText: 'searchBookmarks'.tr(),
+
+                    //* Кнопка шторки
                     leading: IconButton(
                       hoverColor: context.colorScheme.surface,
                       icon: Icon(
@@ -83,6 +90,8 @@ class HomePageState extends State<HomePage>
                         Scaffold.of(context).openDrawer();
                       },
                     ),
+
+                    //* Кнопка очистки поиска
                     trailing: [
                       if (_searchController.text.isNotEmpty)
                         IconButton(
@@ -95,31 +104,34 @@ class HomePageState extends State<HomePage>
                           },
                         ),
                     ],
-                    onSubmitted: (value) {
-                      _performSearch(value);
-                    },
                   );
                 }),
               ],
             ),
+            //* Табы
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(AppPadding.xl),
               child: TabBar(
                 tabAlignment: TabAlignment.center,
                 isScrollable: true,
                 tabs: [
+                  //* Таб All
                   Tab(text: 'all'.tr()),
+                  //* Остальные табы
                   ...state.folderList.map((folder) => Tab(text: folder)),
                 ],
               ),
             ),
           ),
+
+          //* Стэк чтобы LinearProgressIndicator норм отображался
           body: Stack(
             children: [
+              //* Списки закладок
               TabBarView(children: [
-                // Список всех закладок
+                //* Список всех закладок
                 BookmarkListWidget(bookmarkList: bookmarkList),
-                // Остальные папки
+                //* Остальные папки
                 ...state.folderList.map((folder) {
                   return BookmarkListWidget(
                     bookmarkList: bookmarkList
@@ -128,10 +140,14 @@ class HomePageState extends State<HomePage>
                   );
                 }),
               ]),
+
+              //* Отображение загрузки
               if (state.isLoading || state.isSyncing)
                 const LinearProgressIndicator(),
             ],
           ),
+
+          //* Кнопка создания закладки
           floatingActionButton: FilledButton(
             onPressed: () {
               showCreateBookmarkWidget(context);
@@ -146,11 +162,6 @@ class HomePageState extends State<HomePage>
         ),
       );
     });
-  }
-
-  void _performSearch(String query) {
-    // Implement your search logic here
-    print('Searching for: $query');
   }
 
   @override

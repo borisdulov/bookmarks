@@ -4,6 +4,7 @@ import 'package:firebase_auth_ex/core/service/local_storage_service.dart';
 import 'package:firebase_auth_ex/feature/bookmark/model/bookmark_model.dart';
 import 'package:firebase_auth_ex/feature/bookmark/repository/local_bookmark_repository_interface.dart';
 
+/// Реализация удаленного репозитория закладок с sharedPreferences
 class LocalBookmarkRepository implements ILocalBookmarkRepository {
   final LocalStorageService _storage;
   static const String _localBookmarksKey = 'bookmarks';
@@ -26,6 +27,7 @@ class LocalBookmarkRepository implements ILocalBookmarkRepository {
     }
   }
 
+  /// Перезаписывает хранилище новыми закладками
   @override
   Future<void> updateBookmarks(List<BookmarkModel> bookmarks) async {
     try {

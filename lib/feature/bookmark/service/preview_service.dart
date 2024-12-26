@@ -4,11 +4,13 @@ import 'package:firebase_auth_ex/feature/bookmark/model/bookmark_model.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
+/// Сервис который получает open graph данные и фавикон по ссылке
 final class PreviewService {
   final Dio _dio;
 
   PreviewService({required Dio dio}) : _dio = dio;
 
+  //* Метод для добавления og и фавикона в модель закладки
   Future<BookmarkModel?> addPreviewData(BookmarkModel bookmark) async {
     try {
       final response = await _dio.get(bookmark.url);

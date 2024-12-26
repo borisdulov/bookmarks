@@ -63,8 +63,7 @@ abstract final class AppColorScheme {
 
 abstract final class AppTheme {
   static ThemeData get lightTheme => _createTheme(AppColorScheme.light);
-  static ThemeData get darkTheme =>
-      _createTheme(AppColorScheme.dark); // Исправлена опечатка
+  static ThemeData get darkTheme => _createTheme(AppColorScheme.dark);
 
   static ThemeData _createTheme(ColorScheme colorScheme) {
     return ThemeData(

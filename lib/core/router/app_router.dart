@@ -16,7 +16,7 @@ abstract final class AppRouter {
       ShellRoute(
         navigatorKey: AppRouterKey.authenticatedKey,
         builder: (context, state, child) => MultiBlocProvider(
-            providers: [BookmarkProvider.create(context)], child: child),
+            providers: [BookmarkProvider(context: context)], child: child),
         routes: [
           GoRoute(
             path: HomePage.path,

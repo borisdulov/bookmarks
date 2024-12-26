@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class AuthProvider extends BlocProvider<AuthCubit> {
   AuthProvider({super.key})
       : super(
-            create: (context) =>
-                AuthCubit(firebaseAuth: context.appConfig.state.authInstance));
+            create: (context) => AuthCubit(
+                firebaseAuth: context.appConfig.state.authInstance,
+                googleSignIn: context.appConfig.state.googleSignIn));
 }

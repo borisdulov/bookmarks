@@ -23,6 +23,7 @@ class BookmarkModel with _$BookmarkModel {
     required DateTime updatedAt,
     //? Если копия закладки находится в облаке, мы не удаляем ее локально, а помечаем удаленной (isDeleted)
     //? Это сделано для того, чтобы при синхронизации понять, что эту заметку надо удалить из облака
+    //TODO логика выше пока не реализована
   }) = _BookmarkModel;
 
   factory BookmarkModel.fromJson(Map<String, dynamic> json) =>

@@ -11,7 +11,7 @@ extension BuildContextExtension on BuildContext {
   ThemeCubit get themeCubit => BlocProvider.of<ThemeCubit>(this);
   AuthCubit get authCubit => BlocProvider.of<AuthCubit>(this);
   AppConfigCubit get appConfig => BlocProvider.of<AppConfigCubit>(this);
-  BookmarkCubit get bookmarkListCubit => BlocProvider.of<BookmarkCubit>(this);
+  BookmarkCubit get bookmarkCubit => BlocProvider.of<BookmarkCubit>(this);
   LocaleCubit get localeCubit => BlocProvider.of<LocaleCubit>(this);
 
   // Тема

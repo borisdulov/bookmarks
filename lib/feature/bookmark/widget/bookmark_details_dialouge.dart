@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+/// Диалог действий с закладкой (Копировать, редактировать, удалить)
 void showBookmarkDetailsDialog(BookmarkModel bookmark) {
   showDialog(
       context: AppRouterKey.authenticatedKey.currentContext!,
@@ -32,6 +33,7 @@ class BookmarkDetailsDialog extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  //* Копировать
                   ListTile(
                     leading: const Icon(Icons.copy),
                     title: Text('copy'.tr()),
@@ -41,6 +43,8 @@ class BookmarkDetailsDialog extends StatelessWidget {
                       context.pop();
                     },
                   ),
+
+                  //* Редакитровать
                   ListTile(
                     leading: const Icon(Icons.edit),
                     title: Text('edit'.tr()),
@@ -51,6 +55,8 @@ class BookmarkDetailsDialog extends StatelessWidget {
                           bookmark: bookmark);
                     },
                   ),
+
+                  //* Удалить
                   ListTile(
                       leading:
                           Icon(Icons.delete, color: context.colorScheme.error),
@@ -58,7 +64,7 @@ class BookmarkDetailsDialog extends StatelessWidget {
                           style: TextStyle(color: context.colorScheme.error)),
                       onTap: () {
                         AppRouterKey
-                            .authenticatedKey.currentContext?.bookmarkListCubit
+                            .authenticatedKey.currentContext?.bookmarkCubit
                             .deleteBookmark(bookmark);
                         context.pop();
                       })
